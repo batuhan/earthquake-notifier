@@ -1,33 +1,40 @@
 import xml2js from "xml2js";
+import { createConnection } from "typeorm";
 import get from "./helpers/request";
 import { EARTHQUAKE_ENDPOINT } from "./helpers/config";
+import Earthquake from "./entities/earthquake";
 
-interface Earthquake {
-  date: Date;
-  location: string;
-  latitude: number;
-  longitude: number;
-  magnitude: number;
-  depth: number;
+async function stuff($: Record<string, string>): Promise<Earthquake | null> {
+  const date = new Date($.name.replace(".", "-"));
+  const oldEarthquake = await Earthquake.findOne({ where: { date } });
+  if (!oldEarthquake) {
+    const newEarthquake = new Earthquake();
+    newEarthquake.date = date;
+    newEarthquake.location = $.lokasyon.trim();
+    newEarthquake.latitude = Number($.lat);
+    newEarthquake.longitude = Number($.lng);
+    newEarthquake.magnitude = Number($.mag);
+    newEarthquake.depth = Number($.Depth);
+    return newEarthquake.save();
+  }
+  return null;
 }
 
 async function bootstrap(): Promise<void> {
+  await createConnection();
+
   const data = await get(EARTHQUAKE_ENDPOINT);
   const parsedData = await xml2js.parseStringPromise(data);
-  const mappedData = parsedData.eqlist.earhquake.map(
-    (x: { $: Record<string, string> }): Earthquake => {
-      const { $ } = x;
-      return {
-        date: new Date($.name.replace(".", "-")),
-        location: $.lokasyon.trim(),
-        latitude: Number($.lat),
-        longitude: Number($.lng),
-        magnitude: Number($.mag),
-        depth: Number($.Depth)
-      };
-    }
-  );
-  console.log(mappedData);
+  const earthquakes = parsedData.eqlist.earhquake;
+
+  const promises = [];
+  for (let i = 0; i < earthquakes.length; i += 1) {
+    const { $ } = earthquakes[i];
+    promises.push(stuff($));
+  }
+
+  await Promise.all(promises);
+  console.log(promises);
 }
 
 bootstrap();
