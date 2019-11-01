@@ -1,0 +1,15 @@
+extends:
+  [
+    airbnb-base,
+    eslint:recommended,
+    plugin:@typescript-eslint/eslint-recommended,
+    plugin:@typescript-eslint/recommended,
+    prettier,
+    prettier/@typescript-eslint,
+  ]
+rules:
+  no-console: off
+settings:
+  import/resolver:
+    node:
+      extensions: [.js, .ts]
