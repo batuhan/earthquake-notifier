@@ -35,7 +35,6 @@ async function bootstrap(): Promise<void> {
   }
 
   await Promise.all(promises);
-  console.log(promises);
 }
 
 bootstrap();
