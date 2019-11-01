@@ -6,6 +6,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from "typeorm";
+import { Entry } from "node-geocoder";
+
+export interface Geocodes {
+  openStreetMap?: Entry[];
+  google?: Entry[];
+}
 
 @Entity()
 export default class Earthquake extends BaseEntity {
@@ -35,4 +41,7 @@ export default class Earthquake extends BaseEntity {
 
   @Column("float")
   depth!: number;
+
+  @Column("simple-json")
+  geocodes!: object;
 }
