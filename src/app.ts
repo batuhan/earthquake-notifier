@@ -4,7 +4,7 @@ import get from "./helpers/request";
 import { EARTHQUAKE_ENDPOINT } from "./helpers/config";
 import Earthquake from "./entities/earthquake";
 
-async function stuff($: Record<string, string>): Promise<Earthquake | null> {
+async function save($: Record<string, string>): Promise<Earthquake | null> {
   const date = new Date($.name.replace(".", "-"));
   const location = $.lokasyon.trim();
   const oldEarthquake = await Earthquake.findOne({ where: { date, location } });
@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
   const promises = [];
   for (let i = 0; i < earthquakes.length; i += 1) {
     const { $ } = earthquakes[i];
-    promises.push(stuff($));
+    promises.push(save($));
   }
 
   await Promise.all(promises);
