@@ -6,11 +6,12 @@ import Earthquake from "./entities/earthquake";
 
 async function stuff($: Record<string, string>): Promise<Earthquake | null> {
   const date = new Date($.name.replace(".", "-"));
-  const oldEarthquake = await Earthquake.findOne({ where: { date } });
+  const location = $.lokasyon.trim();
+  const oldEarthquake = await Earthquake.findOne({ where: { date, location } });
   if (!oldEarthquake) {
     const newEarthquake = new Earthquake();
     newEarthquake.date = date;
-    newEarthquake.location = $.lokasyon.trim();
+    newEarthquake.location = location;
     newEarthquake.latitude = Number($.lat);
     newEarthquake.longitude = Number($.lng);
     newEarthquake.magnitude = Number($.mag);
