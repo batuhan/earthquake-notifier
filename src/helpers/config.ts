@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 
 config();
+config({ path: ".env.secret" });
 
 function throwError(envVar: string): void {
   throw new Error(`env variable not set for ${envVar}`);
