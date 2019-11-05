@@ -1,13 +1,15 @@
 import xml2js from "xml2js";
 import { createConnection } from "typeorm";
 import axios from "axios";
-import { EARTHQUAKE_ENDPOINT } from "./helpers/config";
+import { EARTHQUAKE_ENDPOINT, MAGNITUDE_THRESHOLD } from "./helpers/config";
 import Earthquake, { Geocodes } from "./entities/earthquake";
 import { openStreetMapGeocoder } from "./helpers/geocode";
 import sendToSlack from "./helpers/sender";
 
 async function save($: Record<string, string>): Promise<Earthquake | null> {
-  const date = new Date($.name.replace(".", "-"));
+  const date = new Date(
+    `${$.name.replace(/\./gi, "-").replace(/ /gi, "T")}+0300`
+  );
   const location = $.lokasyon.trim();
   const oldEarthquake = await Earthquake.findOne({ where: { date, location } });
   if (!oldEarthquake) {
@@ -37,7 +39,7 @@ async function save($: Record<string, string>): Promise<Earthquake | null> {
 
 async function process($: Record<string, string>): Promise<Earthquake | null> {
   const earthquake = await save($);
-  if (earthquake) {
+  if (earthquake && earthquake.magnitude > MAGNITUDE_THRESHOLD) {
     await sendToSlack(earthquake);
   }
   return earthquake;

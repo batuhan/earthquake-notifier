@@ -10,6 +10,10 @@ function throwStringError(envVar: string): string {
   throw throwError(envVar);
 }
 
+function throwNumberError(envVar: string): number {
+  throw throwError(envVar);
+}
+
 export const IS_PRODUCTION = process.env.NODE_ENV === "production" || false;
 
 export const EARTHQUAKE_ENDPOINT =
@@ -17,3 +21,7 @@ export const EARTHQUAKE_ENDPOINT =
 
 export const SLACK_HOOK_URL =
   process.env.SLACK_HOOK_URL || throwStringError("SLACK_HOOK_URL");
+
+export const MAGNITUDE_THRESHOLD =
+  Number(process.env.MAGNITUDE_THRESHOLD) ||
+  throwNumberError("MAGNITUDE_THRESHOLD");
