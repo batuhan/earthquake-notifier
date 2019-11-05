@@ -1,7 +1,11 @@
 import xml2js from "xml2js";
 import { createConnection } from "typeorm";
 import axios from "axios";
-import { EARTHQUAKE_ENDPOINT, MAGNITUDE_THRESHOLD } from "./helpers/config";
+import {
+  EARTHQUAKE_ENDPOINT,
+  MAGNITUDE_THRESHOLD,
+  TIME_BETWEEN_EXECUTIONS
+} from "./helpers/config";
 import Earthquake, { Geocodes } from "./entities/earthquake";
 import { openStreetMapGeocoder } from "./helpers/geocode";
 import sendToSlack from "./helpers/sender";
@@ -29,7 +33,7 @@ async function save($: Record<string, string>): Promise<Earthquake | null> {
       geocodes.openStreetMap = await openStreetMapGeocoder.reverse(loc);
       // geocodes.google = await googleGeocoder.reverse(loc);
     } catch (e) {
-      console.log(e);
+      console.log(new Date().toISOString(), e);
     }
     earthquake.geocodes = geocodes;
     return earthquake.save();
@@ -45,8 +49,8 @@ async function process($: Record<string, string>): Promise<Earthquake | null> {
   return earthquake;
 }
 
-async function bootstrap(): Promise<void> {
-  await createConnection();
+async function app(): Promise<void> {
+  console.log(`execution started at ${new Date().toISOString()}`);
 
   const { data } = await axios.get(EARTHQUAKE_ENDPOINT);
   const parsedData = await xml2js.parseStringPromise(data);
@@ -57,8 +61,15 @@ async function bootstrap(): Promise<void> {
     const { $ } = earthquakes[i];
     promises.push(process($));
   }
-
   await Promise.all(promises);
+
+  await new Promise(resolve => setTimeout(resolve, TIME_BETWEEN_EXECUTIONS));
+  await app();
+}
+
+async function bootstrap(): Promise<void> {
+  await createConnection();
+  await app();
 }
 
 bootstrap();

@@ -26,3 +26,7 @@ export const SLACK_HOOK_URL =
 export const MAGNITUDE_THRESHOLD =
   Number(process.env.MAGNITUDE_THRESHOLD) ||
   throwNumberError("MAGNITUDE_THRESHOLD");
+
+export const TIME_BETWEEN_EXECUTIONS =
+  Number(process.env.TIME_BETWEEN_EXECUTIONS) ||
+  throwNumberError("TIME_BETWEEN_EXECUTIONS");
