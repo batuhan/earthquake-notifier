@@ -27,7 +27,7 @@
     "node-geocoder": "^3.25.0",
     "pg": "^7.12.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.20",
+    "typeorm": "^0.2.25",
     "xml2js": "^0.4.22"
   }
 }
